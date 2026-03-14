@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings – Keyword Finalization Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0c0c0f;
+      --bg-elevated: #131316;
+      --surface: #1a1a1f;
+      --surface-hover: #222228;
+      --border: #2c2c34;
+      --border-focus: #3d7bf5;
+      --text: #f0f0f2;
+      --text-secondary: #8b8b95;
+      --text-tertiary: #5c5c66;
+      --accent: #3d7bf5;
+      --accent-hover: #5b94f7;
+      --accent-muted: rgba(61, 123, 245, 0.12);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 8px 32px rgba(0,0,0,0.35);
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { max-width: 560px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    nav a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    nav a:hover { color: var(--accent); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, var(--accent), #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .card-title-block h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 0.35rem 0;
+      letter-spacing: -0.02em;
+    }
+    .card-title-block .sub {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .section {
+      margin-top: 1.75rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border);
+    }
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input::placeholder { color: var(--text-tertiary); }
+    input:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-muted);
+    }
+    .hint {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .hint-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+    .hint-dot.warn { background: #f59e0b; }
+    .btn {
+      padding: 0.75rem 1.35rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      background: var(--accent);
+      color: #fff;
+      margin-top: 0.5rem;
+      transition: background 0.2s;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .msg {
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-sm);
+      display: none;
+    }
+    .msg.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .msg.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .help-text {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
+    .help-text a { color: var(--accent); text-decoration: none; }
+    .help-text a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <a href="/">← Back to Keyword Tool</a>
+      <a href="#" data-logout>Log out</a>
+    </nav>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" aria-hidden="true">⚙</div>
+        <div class="card-title-block">
+          <h1>Settings</h1>
+          <p class="sub">Manage the Serper API key used for keyword checks. All users will use this key until you change it.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Serper API key</div>
+        <form id="settingsForm">
+          <label for="apiKey">New API key</label>
+          <input
+            type="password"
+            id="apiKey"
+            name="apiKey"
+            placeholder="Paste your Serper API key here"
+            autocomplete="off"
+          />
+          <p class="hint" id="currentHint">
+            <span class="hint-dot" id="hintDot"></span>
+            <span id="hintText">Loading…</span>
+          </p>
+          <button type="submit" class="btn" id="btnSave">Save API key</button>
+          <p class="msg" id="msg"></p>
+        </form>
+      </div>
+
+      <p class="help-text">
+        Get an API key from <a href="https://serper.dev" target="_blank" rel="noopener">serper.dev</a>.
+        If keyword checks return "Invalid API key", update the key here and try again.
+      </p>
+    </div>
+  </div>
+  <script>
+    const form = document.getElementById("settingsForm");
+    const apiKeyInput = document.getElementById("apiKey");
+    const btnSave = document.getElementById("btnSave");
+    const msg = document.getElementById("msg");
+    const hintText = document.getElementById("hintText");
+    const hintDot = document.getElementById("hintDot");
+
+    document.querySelector("[data-logout]").addEventListener("click", async (e) => {
+      e.preventDefault();
+      await fetch("/api/logout", { method: "POST" });
+      window.location.href = "/login";
+    });
+
+    function showMsg(text, type) {
+      msg.textContent = text;
+      msg.className = "msg " + type;
+      msg.style.display = "block";
+    }
+    function hideMsg() {
+      msg.style.display = "none";
+      msg.className = "msg";
+    }
+
+    async function loadSettings() {
+      try {
+        const res = await fetch("/api/settings");
+        if (!res.ok) {
+          hintText.textContent = "Could not load settings.";
+          hintDot.classList.add("warn");
+          return;
+        }
+        const data = await res.json();
+        hintDot.classList.remove("warn");
+        if (data.apiKeySet && data.masked) {
+          hintText.textContent = "Current key saved (ending in " + data.masked + ")";
+        } else {
+          hintText.textContent = "No custom key set. The default key is used for keyword checks.";
+        }
+      } catch (_) {
+        hintText.textContent = "Could not load settings.";
+        hintDot.classList.add("warn");
+      }
+    }
+    loadSettings();
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideMsg();
+      const key = apiKeyInput.value.trim();
+      if (!key) {
+        showMsg("Please enter an API key.", "error");
+        return;
+      }
+      btnSave.disabled = true;
+      try {
+        const res = await fetch("/api/settings", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ apiKey: key })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          showMsg(data.error || "Failed to save.", "error");
+          btnSave.disabled = false;
+          return;
+        }
+        showMsg("API key saved. Keyword checks will use this key from now on.", "success");
+        apiKeyInput.value = "";
+        loadSettings();
+      } catch (err) {
+        showMsg("Network error. Try again.", "error");
+      }
+      btnSave.disabled = false;
+    });
+  </script>
+</body>
+</html>

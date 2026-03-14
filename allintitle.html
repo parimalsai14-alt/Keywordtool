@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keyword Finalization Tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #0c0c0f;
+      --bg-elevated: #131316;
+      --surface: #1a1a1f;
+      --surface-hover: #222228;
+      --border: #2c2c34;
+      --border-focus: #3d7bf5;
+      --text: #f0f0f2;
+      --text-secondary: #8b8b95;
+      --text-tertiary: #5c5c66;
+      --accent: #3d7bf5;
+      --accent-hover: #5b94f7;
+      --accent-muted: rgba(61, 123, 245, 0.15);
+      --easy: #10b981;
+      --easy-bg: rgba(16, 185, 129, 0.12);
+      --medium: #f59e0b;
+      --medium-bg: rgba(245, 158, 11, 0.12);
+      --hard: #ef4444;
+      --hard-bg: rgba(239, 68, 68, 0.12);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+      --transition: 0.2s ease;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .top-nav-links { display: flex; gap: 1rem; }
+    .top-nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
+    .top-nav-links a:hover { color: var(--accent); }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent) 0%, #2563eb 100%);
+      border-radius: var(--radius-sm);
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+      margin-bottom: 0.75rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.4rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      padding: 1rem 1.15rem;
+      font-size: 0.9375rem;
+      font-family: inherit;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      resize: vertical;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+
+    textarea::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--accent-muted);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 560px) {
+      .row { grid-template-columns: 1fr; }
+    }
+
+    select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.9375rem;
+      font-family: inherit;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b8b95' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 2.25rem;
+      transition: border-color var(--transition);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--border-focus);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 0.75rem 1.35rem;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition), transform 0.1s, opacity var(--transition);
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+    }
+
+    .file-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    input[type="file"] {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    input[type="file"]::file-selector-button {
+      padding: 0.45rem 0.8rem;
+      font-family: inherit;
+      font-size: 0.875rem;
+      background: var(--border);
+      border: none;
+      border-radius: 8px;
+      color: var(--text);
+      cursor: pointer;
+      margin-right: 0.5rem;
+      transition: background var(--transition);
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: var(--surface-hover);
+    }
+
+    #results { margin-top: 1rem; }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .results-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-tertiary);
+    }
+
+    .results-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .invalid-key-banner {
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: var(--radius-sm);
+      color: var(--hard);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .invalid-key-banner a { color: var(--hard); text-decoration: underline; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th {
+      text-align: left;
+      padding: 0.8rem 1.1rem;
+      background: var(--bg-elevated);
+      font-weight: 600;
+      color: var(--text-tertiary);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+    th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+
+    td {
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr { transition: background var(--transition); }
+    tbody tr:hover td { background: var(--surface-hover); }
+
+    .kw-cell { font-weight: 500; color: var(--text); }
+    .score-cell { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--text); }
+
+    .badge {
+      display: inline-block;
+      padding: 0.3rem 0.65rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-radius: 8px;
+    }
+
+    .badge-easy { background: var(--easy-bg); color: var(--easy); }
+    .badge-medium { background: var(--medium-bg); color: var(--medium); }
+    .badge-hard { background: var(--hard-bg); color: var(--hard); }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 2rem;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-text {
+      color: var(--hard);
+      font-size: 0.875rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg-elevated);
+    }
+
+    .progress-bar {
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+      border-radius: 3px;
+      transition: width 0.25s ease;
+    }
+
+    /* Shimmer skeleton while bulk run */
+    .shimmer-table {
+      min-height: 200px;
+    }
+    .shimmer-table .shimmer-cell {
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .shimmer-table tbody tr {
+      background: var(--surface);
+    }
+    .shimmer-table tr:last-child .shimmer-cell { border-bottom: none; }
+    .shimmer-line {
+      height: 14px;
+      min-width: 60px;
+      border-radius: 6px;
+      background: var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    .shimmer-line::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.14) 40%,
+        rgba(255, 255, 255, 0.14) 60%,
+        transparent 100%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+    }
+    .shimmer-line.short { width: 45%; }
+    .shimmer-line.medium { width: 22%; }
+    .shimmer-line.badge { width: 72px; height: 24px; border-radius: 8px; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav class="top-nav" id="topNav" style="display:none">
+      <span class="top-nav-links">
+        <a href="/admin" id="navSettings" style="display:none">Settings</a>
+        <a href="#" id="navLogout">Log out</a>
+      </span>
+    </nav>
+    <header>
+      <div class="logo" aria-hidden="true">⌘</div>
+      <h1>Keyword Finalization Tool</h1>
+      <p class="subtitle">Check competition and difficulty for your keywords</p>
+    </header>
+
+    <div class="card">
+      <div class="card-title">Keywords</div>
+      <div class="file-wrap">
+        <input type="file" accept=".csv,.xlsx" onchange="handleFileUpload(event)" />
+        <span style="font-size:0.875rem;color:var(--text-secondary)">Upload CSV/Excel or paste below (one per line)</span>
+      </div>
+      <textarea id="keywords" placeholder="Paste keywords here, one per line..."></textarea>
+
+      <div class="row">
+        <div>
+          <label for="country">Country</label>
+          <select id="country">
+            <option value="us">United States</option>
+            <option value="in">India</option>
+            <option value="uk">United Kingdom</option>
+            <option value="ca">Canada</option>
+            <option value="au">Australia</option>
+            <option value="de">Germany</option>
+            <option value="nl">Netherlands</option>
+            <option value="fr">France</option>
+            <option value="es">Spain</option>
+            <option value="it">Italy</option>
+            <option value="jp">Japan</option>
+            <option value="br">Brazil</option>
+            <option value="mx">Mexico</option>
+            <option value="za">South Africa</option>
+          </select>
+        </div>
+        <div>
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="nl">Dutch</option>
+            <option value="it">Italian</option>
+            <option value="hi">Hindi</option>
+            <option value="pt">Portuguese</option>
+            <option value="zh">Chinese</option>
+            <option value="ja">Japanese</option>
+            <option value="ar">Arabic</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-primary" id="btnCheck" onclick="checkAllintitle()">Check keywords</button>
+        <button class="btn btn-secondary" onclick="exportResults()">Export CSV</button>
+      </div>
+
+      <div class="progress-bar" id="progressBar" style="display:none">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="card" id="resultsCard" style="display:none">
+      <div class="results-header">
+        <span class="results-title">Results</span>
+        <span class="results-meta" id="resultsMeta"></span>
+      </div>
+      <div id="invalidKeyBanner" class="invalid-key-banner" style="display:none">
+        Invalid API key. Ask admin to update it in <a href="/admin">Settings</a>.
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <script>
+    const resultData = [];
+    const BATCH_SIZE = 3;
+
+    (async function checkAuth() {
+      try {
+        const res = await fetch("/api/me");
+        if (res.status === 401) {
+          window.location.href = "/login";
+          return;
+        }
+        const me = await res.json();
+        const nav = document.getElementById("topNav");
+        const navSettings = document.getElementById("navSettings");
+        if (me.role === "admin") navSettings.style.display = "inline";
+        nav.style.display = "flex";
+      } catch (_) {
+        window.location.href = "/login";
+      }
+    })();
+
+    document.getElementById("navLogout").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try {
+        await fetch("/api/logout", { method: "POST" });
+      } catch (_) {}
+      window.location.href = "/login";
+    });
+
+    function getDifficulty(score) {
+      if (score <= 5) return { label: "Easy", badge: "badge-easy" };
+      if (score <= 10) return { label: "Medium", badge: "badge-medium" };
+      return { label: "Hard", badge: "badge-hard" };
+    }
+
+    function getDifficultyForCount(score) {
+      if (score <= 1000) return { label: "Easy", badge: "badge-easy" };
+      if (score <= 10000) return { label: "Medium", badge: "badge-medium" };
+      return { label: "Hard", badge: "badge-hard" };
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        const keywords = json.flat().filter(cell => typeof cell === "string");
+        document.getElementById("keywords").value = keywords.join("\n");
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    async function checkAllintitle() {
+      const keywordsRaw = document.getElementById("keywords").value.trim();
+      const country = document.getElementById("country").value;
+      const language = document.getElementById("language").value;
+      const resultsDiv = document.getElementById("results");
+      const resultsCard = document.getElementById("resultsCard");
+      const btnCheck = document.getElementById("btnCheck");
+      const progressBar = document.getElementById("progressBar");
+      const progressFill = document.getElementById("progressFill");
+      const resultsMeta = document.getElementById("resultsMeta");
+
+      resultsDiv.innerHTML = "";
+      resultData.length = 0;
+      resultsCard.style.display = "block";
+
+      if (!keywordsRaw) {
+        alert("Please enter or paste keywords (one per line).");
+        return;
+      }
+
+      const keywords = keywordsRaw.split(/\r?\n/).map(k => k.replace(/\t/g, " ").trim().replace(/\s+/g, " ")).filter(k => k.length > 0);
+      const total = keywords.length;
+      btnCheck.disabled = true;
+      progressBar.style.display = "block";
+      progressFill.style.width = "0%";
+
+      const shimmerRowHtml = (idx) => `
+        <tr id="result-row-${idx}" class="shimmer-row">
+          <td class="shimmer-cell"><div class="shimmer-line short"></div></td>
+          <td class="shimmer-cell"><div class="shimmer-line medium"></div></td>
+          <td class="shimmer-cell"><div class="shimmer-line badge"></div></td>
+        </tr>`;
+      resultsDiv.innerHTML = `
+        <div class="table-wrap shimmer-table" id="resultsTableWrap">
+          <table>
+            <thead><tr>
+              <th>Keyword</th>
+              <th>Result count</th>
+              <th>Difficulty</th>
+            </tr></thead>
+            <tbody id="resultsTableBody">
+              ${Array.from({ length: total }, (_, i) => shimmerRowHtml(i)).join("")}
+            </tbody>
+          </table>
+        </div>`;
+      resultsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+      const batches = [];
+      for (let i = 0; i < keywords.length; i += BATCH_SIZE) {
+        batches.push(keywords.slice(i, i + BATCH_SIZE));
+      }
+
+      let processed = 0;
+      for (let b = 0; b < batches.length; b++) {
+        const batch = batches[b];
+        const startIndex = b * BATCH_SIZE;
+        try {
+          const response = await fetch("/api/allintitle", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ keywords: batch, hl: language, gl: country })
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            const errMsg = data.error || "Error " + response.status;
+            batch.forEach((keyword, i) => {
+              const rowEl = document.getElementById("result-row-" + (startIndex + i));
+              if (rowEl) {
+                rowEl.className = "";
+                rowEl.innerHTML = `<td class="kw-cell">${escapeHtml(keyword)}</td><td class="score-cell">—</td><td><span class="error-text">${escapeHtml(errMsg)}</span></td>`;
+              }
+              resultData.push({ Keyword: keyword, Results: "—", Difficulty: errMsg, Country: country.toUpperCase(), Language: language.toUpperCase() });
+            });
+          } else {
+            const results = data.results || [];
+            results.forEach(({ keyword, results: count, error: apiError }, i) => {
+              const rowIndex = startIndex + i;
+              const rowEl = document.getElementById("result-row-" + rowIndex);
+              if (!rowEl) return;
+              rowEl.className = "";
+              const num = typeof count === "number" ? count : 0;
+              if (apiError) {
+                rowEl.innerHTML = `<td class="kw-cell">${escapeHtml(keyword)}</td><td class="score-cell">—</td><td><span class="error-text" title="${escapeHtml(apiError)}">${escapeHtml(apiError)}</span></td>`;
+                resultData.push({ Keyword: keyword, Results: "—", Difficulty: apiError, Country: country.toUpperCase(), Language: language.toUpperCase() });
+                return;
+              }
+              const diff = num > 100 ? getDifficultyForCount(num) : getDifficulty(num);
+              rowEl.innerHTML = `
+                <td class="kw-cell">${escapeHtml(keyword)}</td>
+                <td class="score-cell">${num.toLocaleString()}</td>
+                <td><span class="badge ${diff.badge}">${escapeHtml(diff.label)}</span></td>`;
+              resultData.push({
+                Keyword: keyword,
+                Results: num,
+                Difficulty: diff.label,
+                Country: country.toUpperCase(),
+                Language: language.toUpperCase()
+              });
+            });
+          }
+        } catch (err) {
+          batch.forEach((keyword, i) => {
+            const rowEl = document.getElementById("result-row-" + (startIndex + i));
+            if (rowEl) {
+              rowEl.className = "";
+              rowEl.innerHTML = `<td class="kw-cell">${escapeHtml(keyword)}</td><td class="score-cell">—</td><td><span class="error-text">${escapeHtml(err.message)}</span></td>`;
+            }
+            resultData.push({ Keyword: keyword, Results: "—", Difficulty: "Error", Country: country.toUpperCase(), Language: language.toUpperCase() });
+          });
+        }
+        processed += batch.length;
+        progressFill.style.width = Math.round((processed / total) * 100) + "%";
+      }
+
+      document.getElementById("resultsTableWrap").classList.remove("shimmer-table");
+      progressFill.style.width = "100%";
+      btnCheck.disabled = false;
+      progressBar.style.display = "none";
+      resultsMeta.textContent = `${resultData.length} keyword${resultData.length !== 1 ? "s" : ""} · ${country.toUpperCase()} · ${language.toUpperCase()}`;
+      const invalidBanner = document.getElementById("invalidKeyBanner");
+      if (invalidBanner) {
+        invalidBanner.style.display = resultData.some(r => r.Difficulty === "Invalid API key") ? "block" : "none";
+      }
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function exportResults() {
+      if (resultData.length === 0) {
+        alert("Run a check first to export results.");
+        return;
+      }
+      const exportRows = resultData.map(r => ({
+        Keyword: r.Keyword,
+        "Result count": r.Results,
+        Difficulty: r.Difficulty,
+        Country: r.Country,
+        Language: r.Language
+      }));
+      const worksheet = XLSX.utils.json_to_sheet(exportRows);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Results");
+      XLSX.writeFile(workbook, "keyword_finalization_results.xlsx");
+    }
+  </script>
+</body>
+</html>
